@@ -39,7 +39,8 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOriginPatterns(List.of(
-                "http://localhost:*"
+                "http://localhost:*",
+                "https://careerhub-frontend.onrender.com"
         ));
 
         configuration.setAllowedMethods(List.of(
@@ -68,19 +69,12 @@ public class SecurityConfig {
 
         http
                 .cors(Customizer.withDefaults())
-
                 .csrf(AbstractHttpConfigurer::disable)
-
                 .formLogin(AbstractHttpConfigurer::disable)
-
                 .httpBasic(AbstractHttpConfigurer::disable)
-
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(
-                                SessionCreationPolicy.STATELESS
-                        )
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-
                 .authorizeHttpRequests(auth -> auth
 
                         // Public APIs
@@ -90,7 +84,7 @@ public class SecurityConfig {
                                 "/uploads/**"
                         ).permitAll()
 
-                        // Public Job APIs (Anyone can browse jobs)
+                        // Public Job APIs
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/jobs",
@@ -98,31 +92,23 @@ public class SecurityConfig {
                                 "/jobs/search/**"
                         ).permitAll()
 
-                        // Recruiter Job Management
-                        .requestMatchers(
-                                HttpMethod.POST,
-                                "/jobs"
-                        ).hasRole("RECRUITER")
+                        // Recruiter Job APIs
+                        .requestMatchers(HttpMethod.POST, "/jobs")
+                        .hasRole("RECRUITER")
 
-                        .requestMatchers(
-                                HttpMethod.PUT,
-                                "/jobs/**"
-                        ).hasRole("RECRUITER")
+                        .requestMatchers(HttpMethod.PUT, "/jobs/**")
+                        .hasRole("RECRUITER")
 
-                        .requestMatchers(
-                                HttpMethod.DELETE,
-                                "/jobs/**"
-                        ).hasRole("RECRUITER")
+                        .requestMatchers(HttpMethod.DELETE, "/jobs/**")
+                        .hasRole("RECRUITER")
 
                         // Recruiter Dashboard
-                        .requestMatchers(
-                                "/dashboard/recruiter"
-                        ).hasRole("RECRUITER")
+                        .requestMatchers("/dashboard/recruiter")
+                        .hasRole("RECRUITER")
 
                         // Job Seeker Dashboard
-                        .requestMatchers(
-                                "/dashboard/jobseeker"
-                        ).hasRole("JOB_SEEKER")
+                        .requestMatchers("/dashboard/jobseeker")
+                        .hasRole("JOB_SEEKER")
 
                         // Job Seeker APIs
                         .requestMatchers(
@@ -132,14 +118,10 @@ public class SecurityConfig {
                         ).hasRole("JOB_SEEKER")
 
                         // Resume Download
-                        .requestMatchers(
-                                "/applications/*/resume"
-                        ).hasAnyRole(
-                                "RECRUITER",
-                                "JOB_SEEKER"
-                        )
+                        .requestMatchers("/applications/*/resume")
+                        .hasAnyRole("RECRUITER", "JOB_SEEKER")
 
-                        // Recruiter Application Management
+                        // Recruiter Application APIs
                         .requestMatchers(
                                 "/applications",
                                 "/applications/job/**",
